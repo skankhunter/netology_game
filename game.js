@@ -6,19 +6,18 @@ class Vector {
     }
     plus (vector) {
         try {
-            vector;
-        } catch (e) {
-            if (e instanceof TypeError) {
-                console.log(e.name + ': ' + e.message);
-                console.log(`Можно прибавлять к вектору только вектор типа Vector`);
-            }
-        }
         let newVector = {
             x : this.x + vector.x,
             y : this.y + vector.y
         };
-        return newVector
-    }
+            return newVector
+        } catch (e) {
+            if (vector instanceof TypeError) {
+                throw new Error('Можно прибавлять к вектору только вектор типа Vector');
+            }
+            return e;
+            }
+        }
 
     times (num) {
         let newVector = {
@@ -30,7 +29,15 @@ class Vector {
 }
 
 class  Actor {
-    constructor (position, size, speed) {
+    constructor (position = {x : 0, y : 0}, size = {a : 0, b : 0}, speed = {x : 0, y : 0}) {
+        try {
 
+            }
+        catch (e) {
+            if (position === null || size === null || speed === null ) {
+                console.log(e.name + ': ' + e.message);
+                console.log(`Можно передавать только вектор типа Vector`);
+            }
+        }
     }
 }
