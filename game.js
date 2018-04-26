@@ -77,12 +77,16 @@ class  Actor {
 }
 
 class Level {
-    constructor(arrayGrids, arrayActors) {
+    constructor(arrayGrids = [], arrayActors = []) {
         this.grid = arrayGrids;
         this.actors = arrayActors;
+        this.status = null;
+        this.height = this.grid.length || 0;
         this.player = this.actors.find( function (item) {
             return item.type === 'player'
-        }); 
+        });
+
+
     }
 }
 /*
