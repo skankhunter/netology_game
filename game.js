@@ -8,7 +8,7 @@ class Vector {
         try {
             return new Vector(this.x + vector.x, this.y + vector.y);
         } catch (e) {
-            if (vector instanceof TypeError) {
+            if (vector !== Vector) {
                 throw new Error('Можно прибавлять к вектору только вектор типа Vector');
             }
             return e;
@@ -27,17 +27,14 @@ class  Actor {
             this.pos = pos;
             this.size = size;
             this.speed = speed;
-            /*this.left =;
-            this.right =;
-            this.top =;
-            this.bottom =;
-           */
+            this.left = pos.x;
+            this.right = pos.x + size.x;
+            this.top = pos.y;
+            this.bottom = pos.y + size.y;
 
-
-           // Object.defineProperty(Actor, this.type, { value: "actor", configurable: false, writable: false, enumerable: true });
-            }
+        }
         catch (e) {
-            if (pos || size || speed instanceof TypeError) {
+            if (pos || size || speed !== new Vector()) {
                 throw new Error('Можно использовать объект типа Vector');
             }
             return e;
@@ -52,7 +49,23 @@ class  Actor {
 
     isIntersect(actor) {
         try {
+            let XColl = false;
+            let YColl = false;
 
+            if ((this.pos.x + this.size.x > actor.pos.x) && (this.pos.x < actor.pos.x + actor.size.x)) {
+                XColl = true
+            }
+            if ((this.pos.y + this.size.y > actor.pos.y) && (this.pos.y < actor.pos.y + actor.size.y)) {
+                YColl = true;
+            }
+            /*
+            if ((actor.pos.x === actor.pos.x) && (actor.pos.y === actor.pos.y )) {
+                return false;
+            }*/
+            if (XColl && YColl) {
+                return true;
+            }
+            return false;
         }
         catch (e) {
             if (actor === null || actor instanceof TypeError) {
@@ -63,31 +76,49 @@ class  Actor {
     }
 }
 
-const items = new Map();
-const player = new Actor();
-items.set('Игрок', player);
-items.set('Первая монета', new Actor(new Vector(10, 10)));
-items.set('Вторая монета', new Actor(new Vector(15, 5)));
-
-function position(item) {
-    return ['left', 'top', 'right', 'bottom']
-        .map(side => `${side}: ${item[side]}`)
-        .join(', ');
-}
-
-function movePlayer(x, y) {
-    player.pos = player.pos.plus(new Vector(x, y));
-}
-
-function status(item, title) {
-    console.log(`${title}: ${position(item)}`);
-    if (player.isIntersect(item)) {
-        console.log(`Игрок подобрал ${title}`);
+class Level {
+    constructor(arrayGrids, arrayActors) {
+        this.grid = arrayGrids;
+        this.actors = arrayActors;
+        this.player = this.actors.find( function (item) {
+            return item.type === 'player'
+        }); 
     }
 }
+/*
+const grid = [
+    [undefined, undefined],
+    ['wall', 'wall']
+];
 
-items.forEach(status);
-movePlayer(10, 10);
-items.forEach(status);
-movePlayer(5, -5);
-items.forEach(status);
+function MyCoin(title) {
+    this.type = 'coin';
+    this.title = title;
+}
+MyCoin.prototype = Object.create(Actor);
+MyCoin.constructor = MyCoin;
+
+const goldCoin = new MyCoin('Золото');
+const bronzeCoin = new MyCoin('Бронза');
+const player = new Actor();
+const fireball = new Actor();
+
+const level = new Level(grid, [ goldCoin, bronzeCoin, player, fireball ]);
+
+level.playerTouched('coin', goldCoin);
+level.playerTouched('coin', bronzeCoin);
+
+if (level.noMoreActors('coin')) {
+    console.log('Все монеты собраны');
+    console.log(`Статус игры: ${level.status}`);
+}
+
+const obstacle = level.obstacleAt(new Vector(1, 1), player.size);
+if (obstacle) {
+    console.log(`На пути препятствие: ${obstacle}`);
+}
+
+const otherActor = level.actorAt(player);
+if (otherActor === fireball) {
+    console.log('Пользователь столкнулся с шаровой молнией');
+}*/
