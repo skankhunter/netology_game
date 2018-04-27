@@ -80,16 +80,48 @@ class Level {
     constructor(arrayGrids = [], arrayActors = []) {
         this.grid = arrayGrids;
         this.actors = arrayActors;
-        this.status = null;
-        this.height = this.grid.length || 0;
         this.player = this.actors.find( function (item) {
             return item.type === 'player'
         });
+        this.height = this.grid.length;
+        this.width = this.height > 0 ?  Math.max(...arrayGrids.map(el => el.length)) : 0;
+        this.status = null;
+        this.finishDelay = 1;
+    }
 
+    isFinished() {
+        if (this.status !== null && this.finishDelay < 0) {
+            return true
+        } else if (this.status !== null && this.finishDelay > 0) {
+            return false
+        }
+        return false
+    }
 
+    actorAt(actor) {
+        try {
+            if (actor.isIntersect()) {
+                return ;
+            }
+            return undefined
+        }
+        catch (e) {
+            if (actor === null || actor instanceof  TypeError) {
+                throw new Error('Можно использовать объект типа Vector');
+            }
+            return e;
+        }
+    }
+
+    obstacleAt(pos, size) {
+        if ( pos < 0) {
+            return "wall"
+        }
+
+        return undefined
     }
 }
-/*
+
 const grid = [
     [undefined, undefined],
     ['wall', 'wall']
@@ -108,7 +140,7 @@ const player = new Actor();
 const fireball = new Actor();
 
 const level = new Level(grid, [ goldCoin, bronzeCoin, player, fireball ]);
-
+/*
 level.playerTouched('coin', goldCoin);
 level.playerTouched('coin', bronzeCoin);
 
