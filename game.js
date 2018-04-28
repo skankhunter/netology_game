@@ -58,10 +58,10 @@ class  Actor {
             if ((this.pos.y + this.size.y > actor.pos.y) && (this.pos.y < actor.pos.y + actor.size.y)) {
                 YColl = true;
             }
-            /*
-            if ((actor.pos.x === actor.pos.x) && (actor.pos.y === actor.pos.y )) {
+
+            if ((actor.pos.x === this.pos.x) && (actor.pos.y === this.pos.y )) {
                 return false;
-            }*/
+            }
             if (XColl && YColl) {
                 return true;
             }
@@ -100,9 +100,11 @@ class Level {
 
     actorAt(actor) {
         try {
-            if (actor.isIntersect()) {
-                return ;
-            }
+            /*for (let i = 0; i < this.actors.length; i++) {
+                if (actor === this.actors[i]) {
+                    return actor;
+                }
+            }*/
             return undefined
         }
         catch (e) {
@@ -114,11 +116,36 @@ class Level {
     }
 
     obstacleAt(pos, size) {
-        if ( pos < 0) {
+        if ( pos.x < 0 || pos.x >= this.width || pos.y < 0) {
             return "wall"
+        }
+        else if (pos.y >= this.width) {
+            return "lava"
         }
 
         return undefined
+    }
+
+    removeActor(actor) {
+        for (let i = 0; i < this.actors.length; i++) {
+            let ind = this.actors.indexOf(this.actors[i]);
+            if (actor === this.actors[i]) {
+                this.actors.splice(ind, 1);
+            }
+        }
+    }
+
+    noMoreActors(str) {
+        for (let i = 0; i < this.actors.length; i++) {
+            if (str === this.actors[i]) {
+                return false
+            }
+
+                return true
+        }
+        if (this.actors === null) {
+            return true
+        }
     }
 }
 
