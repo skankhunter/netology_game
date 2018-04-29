@@ -98,20 +98,23 @@ class Level {
         return false
     }
 
-    actorAt(actor) {
+    actorAt(newActor) {
         try {
-            /*for (let i = 0; i < this.actors.length; i++) {
-                if (actor === this.actors[i]) {
-                    return actor;
+            if ((newActor instanceof Actor) || !(newActor === undefined)) {
+                for (let actor of this.actors) {
+                    if (actor.isIntersect(newActor)) {
+                        return actor;
+                    } else {
+                        return undefined;
+                    }
                 }
-            }*/
-            return undefined
-        }
-        catch (e) {
-            if (actor === null || actor instanceof  TypeError) {
-                throw new Error('Можно использовать объект типа Vector');
+                return undefined;
+                // return this.actors.find(actor => actor.isIntersect(newActor));
+            } else {
+                throw new Error("actor is not instanceof Actor or undefined");
             }
-            return e;
+        } catch (Error) {
+            return error.message;
         }
     }
 
@@ -145,6 +148,21 @@ class Level {
         }
         if (this.actors === null) {
             return true
+        }
+    }
+
+    playerTouched(str, actor) {
+        if (str === 'lava' || str === 'fireball') {
+            this.status = 'lost';
+        }
+        for (let i = 0; i < this.actors.length; i++) {
+           if (str === 'coin' && actor === this.actors[i]) {
+               let ind = this.actors.indexOf(this.actors[i]);
+               this.actors.splice(ind, 1)
+           }
+            /*if (this.actors.length = 0) {
+                this.status = 'won';
+            }*/
         }
     }
 }
