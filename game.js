@@ -203,5 +203,46 @@ class LevelParser {
         if (arrayStrings.length === 0) {
             return [];
         }
+
+        if (arrayStrings == undefined) {
+            return [];
+        }
+    }
+
+    parse (arrayStrings) {
+        let height = arrayStrings.length;
+        let width ;
+        return new Level(); // сюда подставить ширину и высоту
+    }
+}
+
+class Fireball  extends  Actor{
+    constructor (pos = new Vector(0, 0), speed = new Vector(0, 0)) {
+        super();
+        this.pos = pos;
+        this.speed = speed;
+    }
+    get type() {
+        return 'fireball';
+    }
+    getNextPosition (num = 1) {
+        if (this.speed.x === 0 && this.speed.y === 0) {
+            return this.pos;
+        }
+        if (num) {
+            return new Vector(this.pos.x += this.speed.x * num, this.pos.y += this.speed.y * num);
+        }
+        return new Vector(this.pos.x += this.speed.x, this.pos.y += this.speed.y);
+    }
+
+    handleObstacle () {
+        this.speed.x = -this.speed.x;
+        this.speed.y = -this.speed.y;
+    }
+
+    act(num, grid) {
+        if (grid.obstacleAt() === undefined) {
+            return this.pos.getNextPosition()
+        }
     }
 }
