@@ -225,6 +225,7 @@ class Fireball  extends  Actor{
     get type() {
         return 'fireball';
     }
+
     getNextPosition (num = 1) {
         if (this.speed.x === 0 && this.speed.y === 0) {
             return this.pos;
@@ -240,9 +241,24 @@ class Fireball  extends  Actor{
         this.speed.y = -this.speed.y;
     }
 
-    act(num, grid) {
-        if (grid.obstacleAt() === undefined) {
-            return this.pos.getNextPosition()
+    act(time, level) {
+        if (level.obstacleAt(this.pos) === undefined) {
+            this.pos = this.getNextPosition()
+        }
+
+        if (level.obstacleAt(this.speed) === 'wall') {
+            return this.speed = this.handleObstacle()
         }
     }
+}
+
+class HorizontalFireball {
+    constructor(pos) {
+        this.size = new Vector(1,1);
+        this.speed = new Vector(2,0);
+    }
+    get type () {
+        return "fireball"
+    }
+
 }
