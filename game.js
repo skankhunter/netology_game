@@ -29,10 +29,6 @@ class  Actor {
                 this.pos = pos;
                 this.size = size;
                 this.speed = speed;
-                this.left = pos.x;
-                this.right = pos.x + size.x;
-                this.top = pos.y;
-                this.bottom = pos.y + size.y;
             } else {
                 throw new Error("vector is not instanceof Vector or undefined");
             }
@@ -40,6 +36,22 @@ class  Actor {
             return error.message;
         }
     }
+    get left() {
+        return this.pos.x;
+    }
+
+    get top() {
+        return this.pos.y;
+    }
+
+    get right() {
+        return this.pos.x + this.size.x;
+    }
+
+    get bottom() {
+        return this.pos.y + this.size.y;
+    }
+
     get type() {
         return 'actor';
     }
@@ -121,14 +133,25 @@ class Level {
     }
 
     obstacleAt(pos, size) {
-        if ( pos.x < 0 || pos.x >= this.width || pos.y < 0) {
-            return "wall"
-        }
-        else if (pos.y >= this.width) {
-            return "lava"
-        }
+        let xLeft = Math.floor(pos.x);
+        let xRight = Math.floor(pos.x + size.x);
+        let yTop = Math.floor(pos.y);
+        let yBottom = Math.floor(pos.y + size.y);
 
-        return undefined
+        if ( (xLeft < 0) || (xRight > this.width) || (yTop < 0) ) {
+            return 'wall';
+        }
+        if (yBottom >= this.height) {
+            return 'lava';
+        }
+        let x, y;
+        for (x = xLeft; x <= xRight; x++) {
+            for (y = yTop; y <= yBottom; y++) {
+                if ( (this.grid[y][x] === 'wall') || (this.grid[y][x] === 'lava') ) {
+                    return this.grid[y][x];
+                }
+            }
+        }
     }
 
     removeActor(actor) {
@@ -170,12 +193,12 @@ class Level {
 }
 
 class LevelParser {
-    constructor(gridObjects = []) {
-        this.obj = gridObjects;
+    constructor(gridObjects = {}) {
+        this.keysOfGrid = gridObjects;
     }
     actorFromSymbol(str) {
-        if (str) {
-
+        if (str && this.keysOfGrid) {
+            return this.keysOfGrid[str]
         }
         return undefined
     }
@@ -194,25 +217,30 @@ class LevelParser {
         if (arrayStrings.length === 0) {
             return [];
         }
-
         return arrayStrings.map(str => str.split('').map(symb => this.obstacleFromSymbol(symb)));
-
     }
 
     createActors(arrayStrings) {
-        if (arrayStrings.length === 0) {
-            return [];
-        }
-
-        if (arrayStrings == undefined) {
-            return [];
-        }
+        let self = this;
+        return arrayStrings.reduce(function(prev, row, Y) {
+            [...row].forEach(function(c, X) {
+                if (c) {
+                    let Creator = self.actorFromSymbol(c);
+                    if (Creator && typeof (Creator) === "function") {
+                        let pos = new Vector(X, Y);
+                        let maybeActor = new Creator(pos);
+                        if (maybeActor instanceof Actor) {
+                            prev.push(maybeActor);
+                        }
+                    }
+                }
+            });
+            return prev;
+        }, []);
     }
 
     parse (arrayStrings) {
-        let height = arrayStrings.length;
-        let width ;
-        return new Level(); // сюда подставить ширину и высоту
+        return new Level(this.createGrid(arrayStrings), this.createActors(arrayStrings));
     }
 }
 
@@ -242,23 +270,42 @@ class Fireball  extends  Actor{
     }
 
     act(time, level) {
-        if (level.obstacleAt(this.pos) === undefined) {
-            this.pos = this.getNextPosition()
-        }
-
-        if (level.obstacleAt(this.speed) === 'wall') {
-            return this.speed = this.handleObstacle()
+        let nextPosition = this.getNextPosition(time);
+        if (level.obstacleAt(nextPosition, this.size)) {
+            this.handleObstacle();
+        } else {
+            this.pos = nextPosition;
         }
     }
 }
 
-class HorizontalFireball {
+class HorizontalFireball extends Fireball {
     constructor(pos) {
-        this.size = new Vector(1,1);
-        this.speed = new Vector(2,0);
+        super();
+        this.pos = pos;
+        this.size = new Vector(1, 1);
+        this.speed = new Vector(2, 0);
     }
-    get type () {
-        return "fireball"
+}
+
+class VerticalFireball extends Fireball{
+    constructor(pos) {
+        super();
+        this.pos = pos;
+        this.size = new Vector(1,1);
+        this.speed = new Vector(0,2);
+    }
+}
+
+class FireRain extends Fireball{
+    constructor(pos) {
+        super();
+        this.posRain = pos;
+        this.size = new Vector(1,1);
+        this.speed = new Vector(0,3);
     }
 
+    handleObstacle() {
+       this.pos = this.posRain
+    }
 }
