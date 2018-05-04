@@ -113,45 +113,39 @@ class Level {
         return false
     }
 
-    actorAt(actor) {
-        try {
-            if ((actor instanceof Actor) || !(actor === undefined)) {
-                for (let item of this.actors) {
-                    if (item.isIntersect(actor)) {
-                        return item;
-                    } else {
-                        return undefined;
-                    }
-                }
-                return undefined;
-            } else {
-                throw new Error("actor is not instanceof Actor or undefined");
-            }
-        } catch (Error) {
-            return error.message;
+    actorAt(obj) {
+        if (!(obj instanceof(Actor)) || obj === undefined) {
+            throw new Error('actor is not instanceof Actor or undefined')
         }
+        if (this.actors === undefined) {
+            return undefined;
+        }
+        for (const actor of this.actors) {
+            if (actor.isIntersect(obj)) {
+                return actor;
+            }
+        }
+        return undefined;
     }
-
     obstacleAt(pos, size) {
-        let xLeft = Math.floor(pos.x);
-        let xRight = Math.floor(pos.x + size.x);
-        let yTop = Math.floor(pos.y);
-        let yBottom = Math.floor(pos.y + size.y);
-
-        if ( (xLeft < 0) || (xRight > this.width) || (yTop < 0) ) {
+        if (!(pos instanceof(Vector)) || !(size instanceof(Vector))) {
+            throw new Error("position or size is not instanceof Vector")
+        }
+        let actor = new Actor(pos, size);
+        if (actor.top < 0 || actor.left < 0 || actor.right > this.width) {
             return 'wall';
         }
-        if (yBottom >= this.height) {
+        if (actor.bottom > this.height) {
             return 'lava';
         }
-        let x, y;
-        for (x = xLeft; x <= xRight; x++) {
-            for (y = yTop; y <= yBottom; y++) {
-                if ( (this.grid[y][x] === 'wall') || (this.grid[y][x] === 'lava') ) {
-                    return this.grid[y][x];
+        for (let col = Math.floor(actor.top); col < Math.ceil(actor.bottom); col++) {
+            for (let row = Math.floor(actor.left); row < Math.ceil(actor.right); row++) {
+                if (this.grid[col][row] !== undefined) {
+                    return this.grid[col][row];
                 }
             }
         }
+        return undefined;
     }
 
     removeActor(actor) {
