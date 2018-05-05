@@ -5,15 +5,11 @@ class Vector {
         this.y = y;
     }
     plus (vector) {
-        try {
-            if (vector instanceof Vector) {
-                return new Vector(this.x + vector.x, this.y + vector.y);
-            } else {
-                throw new Error("vector is not instanceof Vector or undefined");
-            }
-        } catch (Error) {
-            return error.message;
+        if (!(vector instanceof Vector)) {
+            throw new Error('Можно прибавлять к вектору только вектор типа Vector');
         }
+        return new Vector(this.x + vector.x, this.y + vector.y);
+
     }
 
     times (num) {
@@ -24,16 +20,19 @@ class Vector {
 
 class  Actor {
     constructor (pos = new Vector(0,0), size = new Vector(1,1), speed = new Vector(0,0)) {
-        try {
-            if ((pos instanceof Vector) && (size instanceof Vector) && (speed instanceof Vector)) {
-                this.pos = pos;
-                this.size = size;
-                this.speed = speed;
-            } else {
-                throw new Error("vector is not instanceof Vector or undefined");
-            }
-        } catch (Error) {
-            return error.message;
+        if (!(pos instanceof Vector)) {
+            throw new Error('Расположение не является объектом типа Vector');
+        }
+        if (!(size instanceof Vector)) {
+            throw new Error('Размер не является объектом типа Vector');
+        }
+        if (!(speed instanceof Vector)) {
+            throw new Error('Скорость не является объектом типа Vector');
+        }
+        if ((pos instanceof Vector) && (size instanceof Vector) && (speed instanceof Vector)) {
+            this.pos = pos;
+            this.size = size;
+            this.speed = speed;
         }
     }
     get left() {
@@ -59,36 +58,17 @@ class  Actor {
 
     };
 
-    isIntersect(actor) {
-        try {
-            if ((actor instanceof Actor) || !(actor === undefined)) {
-                let XColl = false;
-                let YColl = false;
-
-                if ((this.pos.x + this.size.x > actor.pos.x) && (this.pos.x < actor.pos.x + actor.size.x)) {
-                    XColl = true
-                }
-                if ((this.pos.y + this.size.y > actor.pos.y) && (this.pos.y < actor.pos.y + actor.size.y)) {
-                    YColl = true;
-                }
-
-                if ((actor.pos.x === this.pos.x) && (actor.pos.y === this.pos.y )) {
-                    return false;
-                }
-                if (XColl && YColl) {
-                    return true;
-                }
-                return false;
-            }
-            else {
-                throw new Error("actor is not instanceof Actor or undefined");
-            }
-
+    isIntersect(obj) {
+        if ( !obj || !(obj instanceof Actor) ) {
+            throw new Error('Нужен объект типа Actor');
         }
-        catch (Error) {
-            return error.message;
+        if (obj === this) {
+            return false;
         }
+        return this.left < obj.right && this.right > obj.left && this.top < obj.bottom && this.bottom > obj.top;
+        
     }
+
 }
 
 class Level {
