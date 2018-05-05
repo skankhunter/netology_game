@@ -368,46 +368,18 @@ class Player extends Actor{
     }
 }
 
-class DOMDisplay {
-    constructor() {
-
-    }
-}
-
-
-const grid = [
-    new Array(3),
-    ['wall', 'wall', 'lava']
-];
-const level = new Level(grid);
-runLevel(level, DOMDisplay);
-const schema = [
-    '         ',
-    '         ',
-    '         ',
-    '         ',
-    '     !xxx',
-    '         ',
-    'xxx!     ',
-    '         '
-];
-const parser = new LevelParser();
-const level = parser.parse(schema);
-runLevel(level, DOMDisplay);
-
-const schema = [
-    '         ',
-    '         ',
-    '         ',
-    '         ',
-    '     !xxx',
-    ' @       ',
-    'xxx!     ',
-    '         '
-];
 const actorDict = {
-    '@': Player
-}
+    '@': Player,
+    'v': FireRain,
+    'o': Coin,
+    '=': HorizontalFireball,
+    '|': VerticalFireball
+
+};
 const parser = new LevelParser(actorDict);
-const level = parser.parse(schema);
-runLevel(level, DOMDisplay);
+
+loadLevels()
+    .then((res) => {
+        runGame(JSON.parse(res), parser, DOMDisplay)
+            .then(() => alert('Вы выиграли!'))
+    });
