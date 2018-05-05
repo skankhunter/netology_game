@@ -66,7 +66,7 @@ class  Actor {
             return false;
         }
         return this.left < obj.right && this.right > obj.left && this.top < obj.bottom && this.bottom > obj.top;
-        
+
     }
 
 }
@@ -324,3 +324,47 @@ class Player extends Actor{
         return 'player'
     }
 }
+
+class DOMDisplay {
+    constructor() {
+
+    }
+}
+
+
+const grid = [
+    new Array(3),
+    ['wall', 'wall', 'lava']
+];
+const level = new Level(grid);
+runLevel(level, DOMDisplay);
+const schema = [
+    '         ',
+    '         ',
+    '         ',
+    '         ',
+    '     !xxx',
+    '         ',
+    'xxx!     ',
+    '         '
+];
+const parser = new LevelParser();
+const level = parser.parse(schema);
+runLevel(level, DOMDisplay);
+
+const schema = [
+    '         ',
+    '         ',
+    '         ',
+    '         ',
+    '     !xxx',
+    ' @       ',
+    'xxx!     ',
+    '         '
+];
+const actorDict = {
+    '@': Player
+}
+const parser = new LevelParser(actorDict);
+const level = parser.parse(schema);
+runLevel(level, DOMDisplay);
