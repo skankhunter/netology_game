@@ -64,24 +64,23 @@ class  Actor {
             return false;
         }
         return this.left < obj.right && this.right > obj.left && this.top < obj.bottom && this.bottom > obj.top;
-
     }
-
 }
 
 class Level {
     constructor(arrayGrids = [], arrayActors = []) {
         this.grid = arrayGrids;
         this.actors = arrayActors;
+        if (this.actors === undefined) { // эту проверку лучше сделать в конструкторе, чтобы нельзя было создать невалидный объект
+            return undefined;
+        }
         this.player = this.actors.find( item => {
             return item.type === 'player'
         });
         this.height = this.grid.length;
-        // можно просто добавить 0 в аргументы Math.max ????????????
-        // вы передаёте в Math.max длины строк, если массив будет пустой,
-        // Math.max будет вызван без аргументов и вернёт NaN,
-        // вместо проверки дотстаточно добавить в список аргументов функции 0
-        this.width = this.height > 0 ?  Math.max(...arrayGrids.map(el => el.length)) : 0;
+        // можно просто добавить 0
+
+        this.width = this.height > 0 ?  Math.max(0,...this.grid.map(el => el.length)) : 0;
         this.status = null;
         this.finishDelay = 1;
     }
@@ -91,24 +90,12 @@ class Level {
     }
 
     actorAt(obj) {
-        // вторая половина проверки лишняя, т.к. undefined instanceof Actor === false
-        if (!(obj instanceof(Actor)) || obj === undefined) {
+        if (!(obj instanceof(Actor)) ) {
             throw new Error('actor is not instanceof Actor or undefined')
         }
-        // эту проверку лучше сделать в конструкторе, чтобы нельзя было создать невалидный объект ???????????
-        // если не задать массив actors, то ничего работать не будет
-        // проще запретить создавать невалидные объекты Level
-        // (проверить, что actors заполнен в конструкторе)
-        if (this.actors === undefined) {
-            return undefined;
-        }
 
-        // у мессива есть специальный метод для поиска объектов в нём
-        for (const actor of this.actors) {
-            if (actor.isIntersect(obj)) {
-                return actor;
-            }
-        }
+        return this.actors.find( (actor) => actor.isIntersect(obj));
+
     }
     obstacleAt(position, size) {
         if (!(position instanceof Vector) ||
@@ -233,10 +220,9 @@ class Fireball  extends  Actor{
     }
 
     act(time, level) {
-        // const <- не исправили
-        // если значение присваивается переменной один раз, то лучше использовать const
-        // на это обращают внимание при финальной проверке диплома
-        let nextPosition = this.getNextPosition(time);
+        // const <-
+        
+        const nextPosition = this.getNextPosition(time);
         if (level.obstacleAt(nextPosition, this.size)) {
             this.handleObstacle();
         } else {
