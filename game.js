@@ -69,8 +69,8 @@ class  Actor {
 
 class Level {
     constructor(arrayGrids = [], arrayActors = []) {
-        this.grid = arrayGrids;
-        this.actors = arrayActors;
+        this.grid = arrayGrids.slice();
+        this.actors = arrayActors.slice();
         if (this.actors === undefined) { // эту проверку лучше сделать в конструкторе, чтобы нельзя было создать невалидный объект
             return undefined;
         }
@@ -126,7 +126,7 @@ class Level {
     }
 
     removeActor(actor) {
-         const actorIndex = this.actors.indexOf(actor);
+        const actorIndex = this.actors.indexOf(actor);
         if (actorIndex !== -1) {
             this.actors.splice(actorIndex, 1);
         }
@@ -221,7 +221,7 @@ class Fireball  extends  Actor{
 
     act(time, level) {
         // const <-
-        
+
         const nextPosition = this.getNextPosition(time);
         if (level.obstacleAt(nextPosition, this.size)) {
             this.handleObstacle();
