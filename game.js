@@ -78,6 +78,9 @@ class Level {
         });
         this.height = this.grid.length;
         // можно просто добавить 0 в аргументы Math.max ????????????
+        // вы передаёте в Math.max длины строк, если массив будет пустой,
+        // Math.max будет вызван без аргументов и вернёт NaN,
+        // вместо проверки дотстаточно добавить в список аргументов функции 0
         this.width = this.height > 0 ?  Math.max(...arrayGrids.map(el => el.length)) : 0;
         this.status = null;
         this.finishDelay = 1;
@@ -88,14 +91,19 @@ class Level {
     }
 
     actorAt(obj) {
+        // вторая половина проверки лишняя, т.к. undefined instanceof Actor === false
         if (!(obj instanceof(Actor)) || obj === undefined) {
             throw new Error('actor is not instanceof Actor or undefined')
         }
         // эту проверку лучше сделать в конструкторе, чтобы нельзя было создать невалидный объект ???????????
+        // если не задать массив actors, то ничего работать не будет
+        // проще запретить создавать невалидные объекты Level
+        // (проверить, что actors заполнен в конструкторе)
         if (this.actors === undefined) {
             return undefined;
         }
 
+        // у мессива есть специальный метод для поиска объектов в нём
         for (const actor of this.actors) {
             if (actor.isIntersect(obj)) {
                 return actor;
@@ -159,6 +167,14 @@ class Level {
 
 class LevelParser {
     constructor(letterDictionary = {}) {
+        // здесь можно создать копию объекта чтобы избежать следующей ситуации
+        // const dict = { some: 'dict'};
+        // const levelParser = new LevelParser(dict);
+        // console.log(levelParser.letterDictionary); -> { some: 'dict' }
+        // dict.some = 'thingelse';
+        // console.log(levelParser.letterDictionary); -> { some: 'thingelse' }
+        // т.е. внутреннее поле объекта меняется извне, это может привести к труднонаходимым ошибкам
+        // тоже самое касается массивов grid и actors в конструкторе класса Level
         this.letterDictionary = Object.assign({}, letterDictionary);
     }
 
@@ -217,7 +233,9 @@ class Fireball  extends  Actor{
     }
 
     act(time, level) {
-        // const
+        // const <- не исправили
+        // если значение присваивается переменной один раз, то лучше использовать const
+        // на это обращают внимание при финальной проверке диплома
         let nextPosition = this.getNextPosition(time);
         if (level.obstacleAt(nextPosition, this.size)) {
             this.handleObstacle();
