@@ -71,16 +71,11 @@ class Level {
     constructor(arrayGrids = [], arrayActors = []) {
         this.grid = arrayGrids.slice();
         this.actors = arrayActors.slice();
-        if (this.actors === undefined) { // эту проверку лучше сделать в конструкторе, чтобы нельзя было создать невалидный объект
-            return undefined;
-        }
         this.player = this.actors.find( item => {
             return item.type === 'player'
         });
         this.height = this.grid.length;
-        // можно просто добавить 0
-
-        this.width = this.height > 0 ?  Math.max(0,...this.grid.map(el => el.length)) : 0;
+        this.width = Math.max(0,...this.grid.map(el => el.length));
         this.status = null;
         this.finishDelay = 1;
     }
@@ -90,17 +85,16 @@ class Level {
     }
 
     actorAt(obj) {
-        if (!(obj instanceof(Actor)) ) {
-            throw new Error('actor is not instanceof Actor or undefined')
+        if (!(obj instanceof(Actor))) {
+            throw new Error('В метод actorAt передан не Actor')
         }
-
         return this.actors.find( (actor) => actor.isIntersect(obj));
-
     }
+
     obstacleAt(position, size) {
         if (!(position instanceof Vector) ||
             !(size instanceof Vector)) {
-            throw new Error(`В метод obstacleAt передан не вектор`);
+            throw new Error(`В метод obstacleAt передан не Vector`);
         }
 
         const borderLeft = Math.floor(position.x);
@@ -154,14 +148,6 @@ class Level {
 
 class LevelParser {
     constructor(letterDictionary = {}) {
-        // здесь можно создать копию объекта чтобы избежать следующей ситуации
-        // const dict = { some: 'dict'};
-        // const levelParser = new LevelParser(dict);
-        // console.log(levelParser.letterDictionary); -> { some: 'dict' }
-        // dict.some = 'thingelse';
-        // console.log(levelParser.letterDictionary); -> { some: 'thingelse' }
-        // т.е. внутреннее поле объекта меняется извне, это может привести к труднонаходимым ошибкам
-        // тоже самое касается массивов grid и actors в конструкторе класса Level
         this.letterDictionary = Object.assign({}, letterDictionary);
     }
 
@@ -197,7 +183,6 @@ class LevelParser {
         },[]);
     }
 
-
     parse (arrayStrings) {
         return new Level(this.createGrid(arrayStrings), this.createActors(arrayStrings));
     }
@@ -220,8 +205,6 @@ class Fireball  extends  Actor{
     }
 
     act(time, level) {
-        // const <-
-
         const nextPosition = this.getNextPosition(time);
         if (level.obstacleAt(nextPosition, this.size)) {
             this.handleObstacle();
@@ -240,7 +223,6 @@ class HorizontalFireball extends Fireball {
 class VerticalFireball extends Fireball{
     constructor(pos = new Vector(0, 0)) {
         super(pos, new Vector(0, 2));
-
     }
 }
 
